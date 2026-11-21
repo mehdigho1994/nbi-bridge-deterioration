@@ -1,7 +1,8 @@
 {
-  "bridge_id": "51|EXAMPLE0001",
+  "_comment": "ILLUSTRATIVE ONLY — not municipal data and not used for training or evaluation. Format demo for predict_from_record.py.",
+  "bridge_id": "51|ILLUSTRATIVE0001",
   "state_code": "51",
-  "structure_number": "EXAMPLE0001",
+  "structure_number": "ILLUSTRATIVE0001",
   "year_built": 1988,
   "structure_kind": "3",
   "structure_type": "02",

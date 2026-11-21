@@ -1,54 +1,50 @@
-# Field mapping: FHWA NBI → our bridge inspection system
+# Conceptual mapping: NBI fields ↔ BridgeWise inspection concepts
 
-This table maps the NBI Coding Guide items used by this prototype to fields in
-**our** inspection system. Replace each `[OUR_FIELD_NAME]` placeholder with the
-real column/API name once integration begins.
+This mapping is **conceptual**. It does not expose the municipal database schema,
+API routes, table names, or internal identifiers of the Karaj BridgeWise system.
 
-Verified NBI delimited column names come from FHWA yearly files (e.g. `VA25.txt`).
+The public repository contains **no municipal inspection records**. Retraining,
+validation, and calibration on local data are required before any operational use.
 
-| Concept | NBI item | NBI delimited column | Our system field | Notes |
+| Concept | NBI item | NBI delimited column | BridgeWise conceptual field | Notes |
 | --- | --- | --- | --- | --- |
-| State / agency code | 1 | `STATE_CODE_001` | `[OUR_FIELD_NAME]` | Part of stable bridge ID |
-| Structure number | 8 | `STRUCTURE_NUMBER_008` | `[OUR_FIELD_NAME]` | Part of stable bridge ID |
-| Bridge ID | 1+8 | `state\|structure` | `[OUR_FIELD_NAME]` | Must be stable across inspections |
-| Year built | 27 | `YEAR_BUILT_027` | `[OUR_FIELD_NAME]` | Used for bridge age |
-| Average daily traffic | 29 | `ADT_029` | `[OUR_FIELD_NAME]` | Traffic exposure proxy |
-| Structure material | 43A | `STRUCTURE_KIND_043A` | `[OUR_FIELD_NAME]` | Kind of material/design |
-| Structure type | 43B | `STRUCTURE_TYPE_043B` | `[OUR_FIELD_NAME]` | Type of design/construction |
-| Deck condition | 58 | `DECK_COND_058` | `[OUR_FIELD_NAME]` | Codes 0–9; `N` = not applicable |
-| Superstructure condition | 59 | `SUPERSTRUCTURE_COND_059` | `[OUR_FIELD_NAME]` | Codes 0–9; `N` = not applicable |
-| Substructure condition | 60 | `SUBSTRUCTURE_COND_060` | `[OUR_FIELD_NAME]` | Codes 0–9; `N` = not applicable |
-| Inspection date | 90 | `DATE_OF_INSPECT_090` | `[OUR_FIELD_NAME]` | NBI is MMYY; we also use inventory year |
-| Inspection frequency | 91 | `INSPECT_FREQ_MONTHS_091` | `[OUR_FIELD_NAME]` | Optional; often ~24 months |
+| Jurisdiction / agency code | 1 | `STATE_CODE_001` | Agency or network code | Part of stable asset ID |
+| Structure number | 8 | `STRUCTURE_NUMBER_008` | Bridge asset identifier | Must remain stable across inspections |
+| Bridge ID | 1+8 | `state\|structure` | Canonical bridge key | Join key for longitudinal history |
+| Year built | 27 | `YEAR_BUILT_027` | Construction / opening year | Used for age |
+| Average daily traffic | 29 | `ADT_029` | Traffic volume estimate | Exposure proxy |
+| Structure material | 43A | `STRUCTURE_KIND_043A` | Primary material class | Categorical |
+| Structure type | 43B | `STRUCTURE_TYPE_043B` | Structural system / design type | Categorical |
+| Deck condition | 58 | `DECK_COND_058` | Deck condition rating | Ordinal; define local scale explicitly |
+| Superstructure condition | 59 | `SUPERSTRUCTURE_COND_059` | Superstructure condition rating | Ordinal |
+| Substructure condition | 60 | `SUBSTRUCTURE_COND_060` | Substructure condition rating | Ordinal |
+| Inspection date | 90 | `DATE_OF_INSPECT_090` | Field inspection timestamp | NBI is MMYY; BridgeWise should store full dates |
+| Inspection frequency | 91 | `INSPECT_FREQ_MONTHS_091` | Planned inspection interval | Optional |
 
-## Target used by this module
-
-For each bridge-year with a defined rating:
+## Primary research target (NBI prototype)
 
 \[
-y = \mathbf{1}\big[\min(58,59,60)_{t+1} \le \min(58,59,60)_t - 1\big]
+y_t = \mathbf{1}\big[\min(58,59,60)_{t+1} \le \min(58,59,60)_t - 1\big]
 \]
 
-Rows where any of items 58–60 is `N` or missing on year \(t\) or \(t+1\) are
-**excluded** from the primary binary target (counts are logged in
-`data/processed/panel_meta.json`).
+Rows with `N` / missing components are excluded from this primary target.
 
-## Extra data our system would need to collect
+## Integration prototype
 
-For this predictive-maintenance style module to transfer beyond the US NBI demo:
+`src/predict_from_record.py` accepts an illustrative JSON history and returns an
+**uncalibrated ranking score** (and optionally a calibrated probability if a
+calibrator bundle is provided). Deployment requires:
 
-1. **Repeated inspections over time** for the same bridge ID (a panel), not one-off surveys.
-2. **A consistent ordinal rating scale** across years (same codes, same component definitions). If our scale differs from NBI 0–9, retrain — do not assume code equivalence.
-3. **Stable asset identifiers** so history can be joined without silent identity breaks after renumbering/rebuilds.
-4. **Inspection timestamps** (or at least inspection year) to build chronological features and time-based evaluation.
-5. **Basic static attributes**: year built (or age), traffic volume, structure material/type.
-6. Ideally: explicit flags when a rating is “not applicable” vs truly missing, and records of major rehab/replacement (to avoid treating rebuilds as mysterious rating jumps).
+1. Local panel construction from BridgeWise histories  
+2. Retraining and chronological validation  
+3. Probability calibration on a held-out chronological period  
+4. Policy decisions for top‑k inspection / maintenance budgets  
 
-Sensor streams, images, or element-level quantities are **not** required for this prototype, but would be natural extensions once the tabular panel pipeline is wired in.
+## Extra data BridgeWise should retain for this modelling pattern
 
-## Integration sketch
-
-`src/predict_from_record.py` accepts a JSON history for one bridge (see
-`examples/bridge_history_example.json`) and returns `p_drop_next_year`. Map our
-API payload into that JSON using the table above, then call the scorer after each
-new inspection is stored.
+1. Repeated inspections with a **stable bridge ID**  
+2. A **consistent ordinal rating scale** over time  
+3. Explicit not-applicable vs missing flags  
+4. Inspection timestamps (not only inventory publish years)  
+5. Basic attributes: age/year built, traffic, structure type/material  
+6. Major rehab / replacement events (to avoid treating rebuilds as mystery jumps)

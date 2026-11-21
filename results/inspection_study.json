@@ -1,0 +1,150 @@
+{
+  "study": "inspection_to_inspection",
+  "carry_forward": {
+    "n_consecutive_inventory_pairs": 125142,
+    "n_with_both_dates": 125142,
+    "fraction_unchanged_inspect_date": 0.464064822361797,
+    "unchanged_inspect": {
+      "n_defined": 43372,
+      "n_positive": 165,
+      "drop_rate": 0.003804297703587568
+    },
+    "changed_inspect": {
+      "n_defined": 52102,
+      "n_positive": 3075,
+      "drop_rate": 0.05901884764500403
+    },
+    "interpretation": "Unchanged DATE_OF_INSPECT_090 across consecutive inventory years indicates carried-forward inspection records rather than a new field assessment. Models trained on inventory-year targets may partly learn update/carry-forward patterns."
+  },
+  "n_inspection_events": 81931,
+  "n_labeled_transitions": 52082,
+  "n_train": 30107,
+  "n_test": 11416,
+  "train_positive_rate": 0.06828976649948516,
+  "test_positive_rate": 0.05842676944639103,
+  "mean_years_between_inspections_test": 1.825811148086524,
+  "exclusion_note": "Transitions require numeric min ratings at both inspection events. years_to_next_inspection is a descriptor only and is not used as a feature.",
+  "models": {
+    "markov": {
+      "metrics": {
+        "threshold": 0.1,
+        "n": 11416,
+        "n_pos": 667,
+        "n_neg": 10749,
+        "positive_rate": 0.05842676944639103,
+        "mean_predicted_probability": 0.06928051525437758,
+        "roc_auc": 0.65969157480986,
+        "average_precision": 0.12631196908324582,
+        "pr_auc": 0.12631196908324582,
+        "precision": 0.2555831265508685,
+        "recall": 0.15442278860569716,
+        "f1": 0.1925233644859813,
+        "brier": 0.053531769912955156,
+        "log_loss": 0.21132038082692436,
+        "confusion_matrix": [
+          [
+            10449,
+            300
+          ],
+          [
+            564,
+            103
+          ]
+        ],
+        "accuracy_secondary": 0.9243167484232656,
+        "ece": 0.010853745807986552
+      },
+      "topk": {
+        "base_rate": 0.05842676944639103,
+        "tie_policy": "min_rating_desc_then_bridge_id",
+        "fractions": {
+          "0.01": {
+            "k": 114,
+            "precision": 0.41228070175438597,
+            "recall": 0.0704647676161919,
+            "lift": 7.056366553565322,
+            "true_positives_in_budget": 47
+          },
+          "0.05": {
+            "k": 571,
+            "precision": 0.2084063047285464,
+            "recall": 0.17841079460269865,
+            "lift": 3.5669660791320625,
+            "true_positives_in_budget": 119
+          },
+          "0.1": {
+            "k": 1142,
+            "precision": 0.16987740805604204,
+            "recall": 0.2908545727136432,
+            "lift": 2.907526972065631,
+            "true_positives_in_budget": 194
+          }
+        }
+      }
+    },
+    "hgb_unweighted": {
+      "selected_max_iter": 100,
+      "val_ap_by_iter": {
+        "50": 0.1407115137373205,
+        "100": 0.1425281977626444,
+        "150": 0.14048287947924146,
+        "200": 0.13921041886388896
+      },
+      "metrics": {
+        "threshold": 0.1,
+        "n": 11416,
+        "n_pos": 667,
+        "n_neg": 10749,
+        "positive_rate": 0.05842676944639103,
+        "mean_predicted_probability": 0.05926811711285917,
+        "roc_auc": 0.7082179674884858,
+        "average_precision": 0.18206418527600465,
+        "pr_auc": 0.18206418527600465,
+        "precision": 0.15966386554621848,
+        "recall": 0.34182908545727136,
+        "f1": 0.21766109785202864,
+        "brier": 0.05217183806775812,
+        "log_loss": 0.20584047167089645,
+        "confusion_matrix": [
+          [
+            9549,
+            1200
+          ],
+          [
+            439,
+            228
+          ]
+        ],
+        "accuracy_secondary": 0.8564295725297828,
+        "ece": 0.006627898972908962
+      },
+      "topk": {
+        "base_rate": 0.05842676944639103,
+        "tie_policy": "min_rating_desc_then_bridge_id",
+        "fractions": {
+          "0.01": {
+            "k": 114,
+            "precision": 0.45614035087719296,
+            "recall": 0.07796101949025487,
+            "lift": 7.807043846497803,
+            "true_positives_in_budget": 52
+          },
+          "0.05": {
+            "k": 571,
+            "precision": 0.2434325744308231,
+            "recall": 0.20839580209895053,
+            "lift": 4.166456176465182,
+            "true_positives_in_budget": 139
+          },
+          "0.1": {
+            "k": 1142,
+            "precision": 0.17425569176882663,
+            "recall": 0.2983508245877061,
+            "lift": 2.982463234232271,
+            "true_positives_in_budget": 199
+          }
+        }
+      }
+    }
+  }
+}

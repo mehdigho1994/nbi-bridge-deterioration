@@ -15,6 +15,9 @@ results/*
 !results/figures/**
 !results/metrics_summary.csv
 !results/metrics_full.json
+!results/supplementary_results.json
+!results/inspection_study.json
+!results/ablation_*.json
 
 # Python
 __pycache__/

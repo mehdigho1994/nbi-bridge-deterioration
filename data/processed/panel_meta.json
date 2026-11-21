@@ -20,7 +20,19 @@
     "n_excluded_next_N_or_missing": 29597,
     "n_primary_defined": 95474,
     "n_primary_positive": 3240,
-    "n_primary_negative": 92234
+    "n_primary_negative": 92234,
+    "alt_defined": {
+      "y_any_component_drop": 96672,
+      "y_deck_drop": 95554,
+      "y_super_drop": 96592,
+      "y_sub_drop": 96672
+    },
+    "alt_positive": {
+      "y_any_component_drop": 7408,
+      "y_deck_drop": 3632,
+      "y_super_drop": 3784,
+      "y_sub_drop": 3055
+    }
   },
   "n_rows": 140012,
   "n_bridges": 14841,

@@ -1,0 +1,327 @@
+{
+  "alternative_targets": {
+    "y_any_component_drop": {
+      "standard_train_to_2023_val_2023_test_2024__y_any_component_drop": {
+        "class_balance": {
+          "n_train": 75023,
+          "n_val": 10813,
+          "n_test": 10836,
+          "train_positive_rate": 0.07961558455407008,
+          "val_positive_rate": 0.06002034587995931,
+          "test_positive_rate": 0.0725359911406423,
+          "n_train_pos": 5973,
+          "n_test_pos": 786
+        },
+        "markov_ap": 0.08658857601423109,
+        "hgb_unweighted_ap": 0.19874090441458583,
+        "hgb_unweighted_mean_pred": 0.06513648856535506
+      },
+      "strict_train_to_2021_val_2022_test_2024__y_any_component_drop": {
+        "class_balance": {
+          "n_train": 64235,
+          "n_val": 10788,
+          "n_test": 10836,
+          "train_positive_rate": 0.08173114345761656,
+          "val_positive_rate": 0.06701890989988876,
+          "test_positive_rate": 0.0725359911406423,
+          "n_train_pos": 5250,
+          "n_test_pos": 786
+        },
+        "markov_ap": 0.08658857601423109,
+        "hgb_unweighted_ap": 0.18925922188167438,
+        "hgb_unweighted_mean_pred": 0.06498493583384776
+      }
+    },
+    "y_deck_drop": {
+      "standard_train_to_2023_val_2023_test_2024__y_deck_drop": {
+        "class_balance": {
+          "n_train": 74299,
+          "n_val": 10619,
+          "n_test": 10636,
+          "train_positive_rate": 0.03990632444582027,
+          "val_positive_rate": 0.02900461437046803,
+          "test_positive_rate": 0.03375329071079353,
+          "n_train_pos": 2965,
+          "n_test_pos": 359
+        },
+        "markov_ap": 0.04931773595373859,
+        "hgb_unweighted_ap": 0.18888314570263295,
+        "hgb_unweighted_mean_pred": 0.03265624625439211
+      },
+      "strict_train_to_2021_val_2022_test_2024__y_deck_drop": {
+        "class_balance": {
+          "n_train": 63689,
+          "n_val": 10610,
+          "n_test": 10636,
+          "train_positive_rate": 0.040729168302218594,
+          "val_positive_rate": 0.0349670122525919,
+          "test_positive_rate": 0.03375329071079353,
+          "n_train_pos": 2594,
+          "n_test_pos": 359
+        },
+        "markov_ap": 0.04931773595373859,
+        "hgb_unweighted_ap": 0.17790263387429034,
+        "hgb_unweighted_mean_pred": 0.030165400992892718
+      }
+    },
+    "y_super_drop": {
+      "standard_train_to_2023_val_2023_test_2024__y_super_drop": {
+        "class_balance": {
+          "n_train": 74945,
+          "n_val": 10812,
+          "n_test": 10835,
+          "train_positive_rate": 0.041096804323170325,
+          "val_positive_rate": 0.029966703662597113,
+          "test_positive_rate": 0.03507152745731426,
+          "n_train_pos": 3080,
+          "n_test_pos": 380
+        },
+        "markov_ap": 0.053815558397827326,
+        "hgb_unweighted_ap": 0.16269065602852356,
+        "hgb_unweighted_mean_pred": 0.03551917848559751
+      },
+      "strict_train_to_2021_val_2022_test_2024__y_super_drop": {
+        "class_balance": {
+          "n_train": 64161,
+          "n_val": 10784,
+          "n_test": 10835,
+          "train_positive_rate": 0.0420816383784542,
+          "val_positive_rate": 0.03523738872403561,
+          "test_positive_rate": 0.03507152745731426,
+          "n_train_pos": 2700,
+          "n_test_pos": 380
+        },
+        "markov_ap": 0.053815558397827326,
+        "hgb_unweighted_ap": 0.1596485328809755,
+        "hgb_unweighted_mean_pred": 0.03404798715603715
+      }
+    },
+    "y_sub_drop": {
+      "standard_train_to_2023_val_2023_test_2024__y_sub_drop": {
+        "class_balance": {
+          "n_train": 75023,
+          "n_val": 10813,
+          "n_test": 10836,
+          "train_positive_rate": 0.03334977273636085,
+          "val_positive_rate": 0.023027836863035236,
+          "test_positive_rate": 0.028054632705795498,
+          "n_train_pos": 2502,
+          "n_test_pos": 304
+        },
+        "markov_ap": 0.06792784205058569,
+        "hgb_unweighted_ap": 0.13602271763308293,
+        "hgb_unweighted_mean_pred": 0.027930183370096888
+      },
+      "strict_train_to_2021_val_2022_test_2024__y_sub_drop": {
+        "class_balance": {
+          "n_train": 64235,
+          "n_val": 10788,
+          "n_test": 10836,
+          "train_positive_rate": 0.034576165641784076,
+          "val_positive_rate": 0.026047460140897292,
+          "test_positive_rate": 0.028054632705795498,
+          "n_train_pos": 2221,
+          "n_test_pos": 304
+        },
+        "markov_ap": 0.06791173736334469,
+        "hgb_unweighted_ap": 0.13717651649045803,
+        "hgb_unweighted_mean_pred": 0.028380972622728637
+      }
+    }
+  },
+  "ablation": {
+    "split": "standard_train_to_2023_val_2023_test_2024",
+    "groups": {
+      "current_ratings": {
+        "n_features_numeric": 4,
+        "n_features_categorical": 0,
+        "selected_max_iter": 50,
+        "test_roc_auc": 0.6788617473699918,
+        "test_average_precision": 0.08362261387825437,
+        "mean_predicted_probability": 0.03544775885141299
+      },
+      "current_plus_history": {
+        "n_features_numeric": 14,
+        "n_features_categorical": 0,
+        "selected_max_iter": 150,
+        "test_roc_auc": 0.6989293441766768,
+        "test_average_precision": 0.10508296929942107,
+        "mean_predicted_probability": 0.030964341870829276
+      },
+      "structure_ops": {
+        "n_features_numeric": 2,
+        "n_features_categorical": 0,
+        "selected_max_iter": 200,
+        "test_roc_auc": 0.5577967619189734,
+        "test_average_precision": 0.08389590370217434,
+        "mean_predicted_probability": 0.03445471419565023
+      },
+      "structure_ops_with_cats": {
+        "n_features_numeric": 2,
+        "n_features_categorical": 2,
+        "selected_max_iter": 200,
+        "test_roc_auc": 0.573836752965754,
+        "test_average_precision": 0.08650489352783833,
+        "mean_predicted_probability": 0.033999627010416644
+      },
+      "all_features": {
+        "n_features_numeric": 16,
+        "n_features_categorical": 2,
+        "selected_max_iter": 100,
+        "test_roc_auc": 0.7401711557114079,
+        "test_average_precision": 0.14000464354636422,
+        "mean_predicted_probability": 0.0323435620832637
+      }
+    }
+  },
+  "inspection": {
+    "study": "inspection_to_inspection",
+    "carry_forward": {
+      "n_consecutive_inventory_pairs": 125142,
+      "n_with_both_dates": 125142,
+      "fraction_unchanged_inspect_date": 0.464064822361797,
+      "unchanged_inspect": {
+        "n_defined": 43372,
+        "n_positive": 165,
+        "drop_rate": 0.003804297703587568
+      },
+      "changed_inspect": {
+        "n_defined": 52102,
+        "n_positive": 3075,
+        "drop_rate": 0.05901884764500403
+      },
+      "interpretation": "Unchanged DATE_OF_INSPECT_090 across consecutive inventory years indicates carried-forward inspection records rather than a new field assessment. Models trained on inventory-year targets may partly learn update/carry-forward patterns."
+    },
+    "n_inspection_events": 81931,
+    "n_labeled_transitions": 52082,
+    "n_train": 30107,
+    "n_test": 11416,
+    "train_positive_rate": 0.06828976649948516,
+    "test_positive_rate": 0.05842676944639103,
+    "mean_years_between_inspections_test": 1.825811148086524,
+    "exclusion_note": "Transitions require numeric min ratings at both inspection events. years_to_next_inspection is a descriptor only and is not used as a feature.",
+    "models": {
+      "markov": {
+        "metrics": {
+          "threshold": 0.1,
+          "n": 11416,
+          "n_pos": 667,
+          "n_neg": 10749,
+          "positive_rate": 0.05842676944639103,
+          "mean_predicted_probability": 0.06928051525437758,
+          "roc_auc": 0.65969157480986,
+          "average_precision": 0.12631196908324582,
+          "pr_auc": 0.12631196908324582,
+          "precision": 0.2555831265508685,
+          "recall": 0.15442278860569716,
+          "f1": 0.1925233644859813,
+          "brier": 0.053531769912955156,
+          "log_loss": 0.21132038082692436,
+          "confusion_matrix": [
+            [
+              10449,
+              300
+            ],
+            [
+              564,
+              103
+            ]
+          ],
+          "accuracy_secondary": 0.9243167484232656,
+          "ece": 0.010853745807986552
+        },
+        "topk": {
+          "base_rate": 0.05842676944639103,
+          "tie_policy": "min_rating_desc_then_bridge_id",
+          "fractions": {
+            "0.01": {
+              "k": 114,
+              "precision": 0.41228070175438597,
+              "recall": 0.0704647676161919,
+              "lift": 7.056366553565322,
+              "true_positives_in_budget": 47
+            },
+            "0.05": {
+              "k": 571,
+              "precision": 0.2084063047285464,
+              "recall": 0.17841079460269865,
+              "lift": 3.5669660791320625,
+              "true_positives_in_budget": 119
+            },
+            "0.1": {
+              "k": 1142,
+              "precision": 0.16987740805604204,
+              "recall": 0.2908545727136432,
+              "lift": 2.907526972065631,
+              "true_positives_in_budget": 194
+            }
+          }
+        }
+      },
+      "hgb_unweighted": {
+        "selected_max_iter": 100,
+        "val_ap_by_iter": {
+          "50": 0.1407115137373205,
+          "100": 0.1425281977626444,
+          "150": 0.14048287947924146,
+          "200": 0.13921041886388896
+        },
+        "metrics": {
+          "threshold": 0.1,
+          "n": 11416,
+          "n_pos": 667,
+          "n_neg": 10749,
+          "positive_rate": 0.05842676944639103,
+          "mean_predicted_probability": 0.05926811711285917,
+          "roc_auc": 0.7082179674884858,
+          "average_precision": 0.18206418527600465,
+          "pr_auc": 0.18206418527600465,
+          "precision": 0.15966386554621848,
+          "recall": 0.34182908545727136,
+          "f1": 0.21766109785202864,
+          "brier": 0.05217183806775812,
+          "log_loss": 0.20584047167089645,
+          "confusion_matrix": [
+            [
+              9549,
+              1200
+            ],
+            [
+              439,
+              228
+            ]
+          ],
+          "accuracy_secondary": 0.8564295725297828,
+          "ece": 0.006627898972908962
+        },
+        "topk": {
+          "base_rate": 0.05842676944639103,
+          "tie_policy": "min_rating_desc_then_bridge_id",
+          "fractions": {
+            "0.01": {
+              "k": 114,
+              "precision": 0.45614035087719296,
+              "recall": 0.07796101949025487,
+              "lift": 7.807043846497803,
+              "true_positives_in_budget": 52
+            },
+            "0.05": {
+              "k": 571,
+              "precision": 0.2434325744308231,
+              "recall": 0.20839580209895053,
+              "lift": 4.166456176465182,
+              "true_positives_in_budget": 139
+            },
+            "0.1": {
+              "k": 1142,
+              "precision": 0.17425569176882663,
+              "recall": 0.2983508245877061,
+              "lift": 2.982463234232271,
+              "true_positives_in_budget": 199
+            }
+          }
+        }
+      }
+    }
+  }
+}

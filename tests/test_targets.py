@@ -1,11 +1,16 @@
-"""Unit tests for primary target construction and N/missing exclusion."""
+"""Unit tests for primary and supplementary target construction."""
 
 from __future__ import annotations
 
 import pandas as pd
 
 from src.config import COL_DECK, COL_SUB, COL_SUPER
-from src.targets import attach_targets, compute_min_rating, primary_drop_target
+from src.targets import (
+    any_component_drop_target,
+    attach_targets,
+    compute_min_rating,
+    primary_drop_target,
+)
 
 
 def _row(year: int, deck: str, super_: str, sub: str, bridge: str = "51|A") -> dict:
@@ -42,15 +47,20 @@ def test_primary_drop_target() -> None:
     assert primary_drop_target(7.0, None) is None
 
 
+def test_any_component_when_min_unchanged() -> None:
+    # Deck drops 7→6 but min stays 5 because sub=5 both years.
+    assert any_component_drop_target(7, 7, 5, 6, 7, 5) == 1.0
+    assert primary_drop_target(5.0, 5.0) == 0.0
+
+
 def test_attach_targets_drop_and_exclusion_counts() -> None:
-    # Bridge A: 7->6 drop; Bridge B: next year has N → excluded.
     df = pd.DataFrame(
         [
             _row(2020, "7", "7", "7", "51|A"),
             _row(2021, "6", "7", "7", "51|A"),
             _row(2020, "5", "5", "5", "51|B"),
             _row(2021, "N", "5", "5", "51|B"),
-            _row(2020, "N", "8", "8", "51|C"),  # current N
+            _row(2020, "N", "8", "8", "51|C"),
             _row(2021, "8", "8", "8", "51|C"),
         ]
     )
@@ -58,6 +68,7 @@ def test_attach_targets_drop_and_exclusion_counts() -> None:
 
     a_2020 = out[(out["bridge_id"] == "51|A") & (out["inventory_year"] == 2020)].iloc[0]
     assert a_2020["y_drop"] == 1.0
+    assert a_2020["y_deck_drop"] == 1.0
 
     b_2020 = out[(out["bridge_id"] == "51|B") & (out["inventory_year"] == 2020)].iloc[0]
     assert pd.isna(b_2020["y_drop"])
@@ -76,7 +87,7 @@ def test_non_consecutive_years_not_treated_as_next() -> None:
     df = pd.DataFrame(
         [
             _row(2018, "7", "7", "7"),
-            _row(2020, "5", "5", "5"),  # gap — not next year
+            _row(2020, "5", "5", "5"),
         ]
     )
     out, report = attach_targets(df)

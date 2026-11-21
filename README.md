@@ -1,188 +1,188 @@
-# Bridge condition deterioration prediction (NBI prototype)
+# Machine Learning-Based Bridge Deterioration Prediction for Predictive Maintenance
 
-**Methodological prototype** for a predictive-maintenance module intended to sit on top of an operational bridge inspection system (**BridgeWise**, ICT Organisation of Karaj Municipality).
+**A research prototype for extending the BridgeWise municipal inspection platform toward intelligent infrastructure monitoring.**
 
-This repository does **not** contain Karaj municipal data. It demonstrates, on the public **FHWA National Bridge Inventory (NBI)**, how multi-year inspection histories can be turned into a leakage-aware “will condition drop next year?” model. The same pipeline is designed to plug into BridgeWise once local inspection panels are research-ready.
-
-| | |
+| Layer | Status |
 | --- | --- |
-| Intended host system | BridgeWise — map registry, scheduled inspections, tablet checklists, photo + geolocation evidence (Karaj Municipality) |
-| This repo | Reproducible NBI study (Virginia, 2016–2025) |
-| Status | Research prototype; not a production risk score |
+| BridgeWise (Karaj Municipality) | Existing operational inspection / maintenance platform (not in this repository) |
+| NBI machine-learning study | **Implemented** research prototype (this repository) |
+| Sensing / vision / SHM extensions | **Proposed** future research only |
+
+Author: Mehdi Gholami. Intended audience: academic review of methodology, reproducibility, and integration pathway.
 
 ---
 
-## Why this exists (link to Karaj)
+## 1. Project overview
 
-BridgeWise digitises **inspection and evidence**. The natural next layer is **prioritisation**: which bridges are more likely to lose condition before the next cycle?
+This repository investigates whether multi-year bridge condition ratings can support **maintenance prioritisation** via supervised learning. Experiments use the public FHWA National Bridge Inventory (NBI). The modelling pattern is designed to connect to **BridgeWise**, a municipal inspection system developed at the ICT Organisation of Karaj Municipality, once local research datasets are available under appropriate governance.
 
-Karaj operational records are still being consolidated for research use and are sensitive. Until they can be used under municipal rules, this NBI prototype:
+The contribution is **problem formulation, temporal data engineering, comparative evaluation, and an integration sketch**—not a claim of algorithmic novelty.
 
-1. Forces a clean **panel + time-split** design (no random row leakage).
-2. Provides **baselines** so ML cannot look good by default.
-3. Documents a **field mapping** from NBI items to BridgeWise-style fields (`docs/field_mapping.md`).
-4. Ships a small **JSON scorer** (`src/predict_from_record.py`) as an integration sketch.
+## 2. Research motivation and municipal context
 
-U.S. NBI ≠ Karaj bridges. Metrics here measure the **pipeline**, not transfer performance.
+BridgeWise digitises bridge registration, scheduled inspections, structured field assessment, photographic evidence with geolocation, and maintenance workflows. The natural analytical extension is to estimate which assets are more likely to lose condition before the next intervention cycle.
+
+Municipal records are sensitive and still being prepared for research use. Until then, the NBI provides a public, multi-year panel for methodological development.
+
+## 3. Research objectives
+
+1. Construct a leakage-aware longitudinal panel from yearly NBI extracts.  
+2. Define primary and alternative deterioration labels from component ratings.  
+3. Compare transparent baselines with gradient boosting under chronological validation.  
+4. Separate **ranking performance** from **probability calibration**.  
+5. Document inspection carry-forward effects and a supplementary inspection-to-inspection analysis.  
+6. Provide a conceptual BridgeWise field mapping and JSON scoring interface.
+
+## 4. Dataset and preprocessing
+
+| Setting | Value |
+| --- | --- |
+| Source | FHWA NBI yearly comma-delimited Coding Guide files |
+| State | Virginia (`VA`, code `51`) |
+| Years | 2016–2025 |
+| Records | On-structure routes (`RECORD_TYPE_005A == 1`) |
+| Bridge ID | `STATE_CODE_001` + `STRUCTURE_NUMBER_008` |
+
+Column names are verified from file headers. Raw files are downloaded by `python -m src.download_data` and are not committed. Missing / `N` handling is documented in `docs/missing_values.md`. Culvert-like records (often type 19 with items 58–60 = `N`) dominate primary-target exclusions.
+
+## 5. Prediction target
+
+**Primary (retained):** decrease of at least one point in \(\min(\text{deck},\text{superstructure},\text{substructure})\) from year \(t\) to \(t+1\).
+
+**Supplementary labels** (evaluated separately): any-component drop; deck-only; superstructure-only; substructure-only. These matter operationally because a deck drop may not change the minimum when another component is already lower.
+
+## 6. Methodology
+
+**Features (past/current only):** current ratings; calendar-gated 1–3 year deltas; years since last min-rating change; age; log ADT; structure kind/type. Bridge identifiers are never used as predictors.
+
+**Models:** persistence; Markov transition baseline (training-only); logistic regression (unweighted and class-balanced); HistGradientBoosting (unweighted and class-balanced). Hyperparameter `max_iter` for HGB is selected by Average Precision on a **chronological validation year** (random early stopping disabled).
+
+**Calibration:** sigmoid and isotonic calibrators fitted on validation scores only.
+
+Details: `docs/temporal_validation.md`, `docs/field_mapping.md`.
+
+## 7. Temporal validation strategy
 
 ```mermaid
 flowchart LR
-  A[BridgeWise / NBI<br/>inspection history] --> B[Yearly panel<br/>ratings + attributes]
-  B --> C[Target: min rating<br/>drops next year?]
-  B --> D[Past-only features<br/>lags, age, ADT, type]
-  C --> E[Time split<br/>train ≤ T, test T+1]
-  D --> E
-  E --> F[Baselines<br/>persistence / Markov / logit]
-  E --> G[HistGradientBoosting]
-  F --> H[ROC / PR / top-k<br/>calibration]
-  G --> H
-  H --> I[Prioritisation signal<br/>for maintenance planning]
+  F[Feature year t] --> L[Label from year t+1]
+  Train[Train fit cutoff] --> Val[Validation year]
+  Val --> Test[Test year]
 ```
 
----
+Two protocols are reported:
 
-## Problem
+- **Standard:** one-step panel with chronological train / validation / test (baseline continuity).  
+- **Strict:** all training and validation **label observation years** precede the test **feature year**.
 
-At inventory year \(t\), predict whether the **minimum** of deck / superstructure / substructure ratings (NBI 58/59/60) falls by ≥ 1 at \(t+1\):
+See `docs/temporal_validation.md` for exact cutoffs.
 
-\[
-y_t = \mathbf{1}\big[\min(D_t,S_t,U_t) - \min(D_{t+1},S_{t+1},U_{t+1}) \ge 1\big]
-\]
+## 8. Experimental results
 
-Codes: `0`–`9`; `N` = not applicable → excluded from the primary target when any of 58–60 is `N`/missing at \(t\) or \(t+1\) (see `docs/missing_values.md`).
+Executed results (Virginia NBI). Artifacts: `results/metrics_summary.csv`, `results/metrics_full.json`, `results/supplementary_results.json`, `results/inspection_study.json`, `results/figures/`.
 
-Drops are rare → **do not headline accuracy**. Primary metrics: **ROC-AUC**, **PR-AUC**, class balance, calibration; also top‑k precision/lift for ranking.
+**Primary target prevalence (test):** 2.67% (feature year 2023), 3.06% (2024).
 
----
+### Standard protocol — test feature year 2023
 
-## Data
+| Model | ROC-AUC | Average Precision | Mean predicted p | Brier |
+| --- | ---: | ---: | ---: | ---: |
+| Markov | 0.661 | 0.070 | 0.036 | 0.025 |
+| Logistic (unweighted) | 0.717 | 0.116 | 0.033 | 0.025 |
+| Logistic (balanced) | 0.722 | 0.108 | **0.402** | 0.197 |
+| HGB (unweighted) | **0.757** | **0.127** | 0.031 | 0.025 |
+| HGB (balanced) | 0.751 | 0.121 | **0.342** | 0.155 |
 
-| Setting | Choice |
-| --- | --- |
-| Source | FHWA NBI yearly **comma-delimited** Coding Guide files (header row; quotechar `'`) |
-| State | Virginia (`VA`, code `51`) |
-| Years | **2016–2025** |
-| Records | `RECORD_TYPE_005A == 1` |
-| Bridge ID | `STATE_CODE_001` + `STRUCTURE_NUMBER_008` |
+After sigmoid calibration on the validation year, balanced HGB mean predicted probability falls to ≈0.029 (near prevalence). Ranking metrics are essentially unchanged by monotone calibration; Brier improves for balanced models.
 
-Column names were verified from downloaded headers. Raw files are **not** in git (`data/raw/` gitignored); run `python -m src.download_data`. **No synthetic data.**
+**Top-k (HGB unweighted, 2023 test):** top 1% precision 0.283 (lift ≈10.6×); top 5% precision 0.134 (lift ≈5.0×).
 
-Panel after processing (this run): **140,012** bridge-years, **14,841** bridges; primary target defined on **95,474** rows (**3.39%** positives). Most exclusions are culvert-like (`STRUCTURE_TYPE_043B == 19`, items 58–60 = `N`).
+### Strict protocol — test feature year 2023
 
----
+HGB unweighted ROC-AUC **0.756**, AP **0.130**, mean predicted p **0.032** — comparable to the standard protocol, indicating that stricter label isolation does not erase the ranking signal in this setting.
 
-## Method
+### Carry-forward diagnostic
 
-**Features (current + past only):** component and min ratings; min/component deltas over prior 1–3 **calendar** years (row `shift` gated by year gap); years since last min-rating change; bridge age; log(ADT); structure kind/type.
+46.4% of consecutive inventory-year pairs reuse the same `DATE_OF_INSPECT_090`. Primary-target drop rate: **0.38%** (unchanged date) vs **5.90%** (changed date).
 
-**Models**
+### Inspection-to-inspection study (supplementary)
 
-1. Persistence — \(P(\mathrm{drop})=0\)
-2. Markov — \(P(\mathrm{drop}\mid \text{current min rating})\) on training years only
-3. Logistic regression — imputed/scaled + one-hot; `class_weight='balanced'`
-4. **HistGradientBoosting** (sklearn) — main model; early stopping on a **training** validation fraction
+Distinct inspection-date transitions: train n=30,107 (positive rate 6.8%); test n=11,416 (5.8%). HGB unweighted AP **0.182**, ROC-AUC **0.708** (higher positive rate than inventory-year task).
 
-**Evaluation**
+### Alternative targets (standard split, test 2024; HGB unweighted AP)
 
-- Time splits only: train feature-years ≤ 2022 → test **2023**; ≤ 2023 → test **2024**
-- Test year = **feature** year; label is the drop into the following year
-- Seeds `{42, 123, 456}` for stochastic fits (logistic is effectively deterministic here; HGB varies)
-- Stated decision threshold for P/R tables: **0.10** (not tuned on test; poorly suited to balanced classifiers — see below)
+| Target | Test positive rate | HGB AP | Markov AP |
+| --- | ---: | ---: | ---: |
+| Any component drop | 7.25% | 0.199 | 0.087 |
+| Deck drop | 3.38% | 0.189 | 0.049 |
+| Superstructure drop | 3.51% | 0.163 | 0.054 |
+| Substructure drop | 2.81% | 0.136 | 0.068 |
 
-Unit tests cover target construction and “no test feature year in training features” (`tests/`).
+Deck-only deterioration is more predictable than the min-rating primary target in this sample; any-component labels are more prevalent.
 
----
+### Feature ablation (standard, test 2024, unweighted HGB)
 
-## Results (Virginia NBI run)
+| Feature group | Test AP |
+| --- | ---: |
+| Current ratings only | 0.084 |
+| Current + history | 0.105 |
+| Structure/ops (+ cats) | 0.087 |
+| All features | **0.140** |
 
-| Split | Model | ROC-AUC | PR-AUC | Precision@0.10 | Recall@0.10 |
-| --- | --- | --- | --- | --- | --- |
-| ≤2022 → 2023 | persistence | 0.500 | 0.027 | 0.000 | 0.000 |
-| ≤2022 → 2023 | markov | 0.661 | 0.070 | 0.147 | 0.201 |
-| ≤2022 → 2023 | logistic | 0.722 ± 0.000 | 0.106 ± 0.000 | 0.028 ± 0.000 | 0.993 ± 0.000 |
-| ≤2022 → 2023 | **HGB** | **0.758 ± 0.003** | **0.135 ± 0.003** | 0.029 ± 0.001 | 0.981 ± 0.006 |
-| ≤2023 → 2024 | persistence | 0.500 | 0.031 | 0.000 | 0.000 |
-| ≤2023 → 2024 | markov | 0.618 | 0.073 | 0.126 | 0.154 |
-| ≤2023 → 2024 | logistic | 0.712 ± 0.000 | 0.092 ± 0.000 | 0.032 ± 0.000 | 0.994 ± 0.000 |
-| ≤2023 → 2024 | **HGB** | **0.742 ± 0.001** | **0.143 ± 0.003** | 0.033 ± 0.001 | 0.993 ± 0.002 |
+**Interpretation guidelines**
 
-Test positive rates: **2.67%** (2023), **3.06%** (2024).
+- Headline ranking metrics: ROC-AUC and **Average Precision (AP)**.  
+- Do not headline accuracy under ~3% positive prevalence.  
+- Class-balanced models inflate mean predicted probabilities unless calibrated; uncalibrated outputs are **ranking scores**.  
+- Prefer top‑k precision / lift for constrained inspection budgets.
 
-**Takeaway:** HGB beats Markov on ROC-AUC and PR-AUC on both splits. Absolute PR-AUC stays modest (~0.13–0.14). With `class_weight='balanced'`, mean predicted probabilities (~0.35–0.40) far exceed the ~3% base rate, so **P/R at 0.10 are not useful operating points**; prefer ranking / top‑k / recalibration for deployment.
+## 9. Maintenance prioritisation implications
 
-### Ranking (top‑k on 2023 test; base rate ≈ 2.67%)
+Municipal programmes inspect or intervene under capacity constraints. Top 1% / 5% / 10% precision, recall, and lift estimate how many true deterioration cases are captured within a fixed review budget. Scores support prioritisation—not structural safety certification or collapse prediction.
 
-| Model | Top 1% precision (lift) | Top 5% precision (lift) | Top 10% precision (lift) |
-| --- | --- | --- | --- |
-| Markov | 0.217 (8.1×) | 0.113 (4.2×) | 0.061 (2.3×) |
-| Logistic | 0.226 (8.5×) | 0.113 (4.2×) | 0.087 (3.3×) |
-| **HGB** | **0.292 (11.0×)** | **0.136 (5.1×)** | **0.090 (3.4×)** |
+## 10. Proposed BridgeWise integration
 
-### Figures
+Conceptual field mapping: `docs/field_mapping.md`.  
+JSON scorer: `python -m src.predict_from_record examples/bridge_history_example.json`  
+(example file is **illustrative only**).
 
-![ROC 2023](results/figures/roc_train_to_2022_test_2023.png)
+Operational deployment requires local panel construction, retraining, chronological validation, and calibration.
 
-![PR 2023](results/figures/pr_train_to_2022_test_2023.png)
+## 11. Research limitations
 
-![Calibration 2023](results/figures/calibration_train_to_2022_test_2023.png)
+1. NBI (Virginia) ≠ Karaj inventory (climate, materials, coding practice, scales).  
+2. Inventory year ≠ inspection event; ~half of consecutive year pairs reuse `DATE_OF_INSPECT_090` (carry-forward).  
+3. Standard protocol allows validation labels to use the test feature calendar year.  
+4. Class weighting without calibration mis-scales probabilities.  
+5. No sensors, video, element-level quantities, or rehab modelling in this repository.  
+6. Associations are not causal effects.
 
-(Second split figures: `results/figures/*_train_to_2023_test_2024.png`. Full dump: `results/metrics_full.json`.)
+## 12. Future research directions
 
-### Diagnostic: inspection carry-forward
+*Proposed only—not implemented here.*
 
-Using `DATE_OF_INSPECT_090`, **46.4%** of consecutive inventory-year pairs keep the same inspection date. Among rows with a defined primary target, drop rate is **0.38%** when the date is unchanged vs **5.90%** when it changes. Inventory year ≠ always a new inspection — an important limitation of year-ahead NBI labels.
+- **Vision-based monitoring:** displacement / deflection / vibration from video (optical flow, DIC, tracking), with attention to sampling, camera motion, and calibration.  
+- **Dynamic characterisation:** natural frequencies, mode shapes, damping; frequency shifts as condition indicators.  
+- **Embedded sensing:** low-cost accelerometers, strain gauges, IoT acquisition.  
+- **Signal processing + ML:** spectral / time–frequency features, anomaly detection.  
+- **AI visual damage assessment:** cracks, corrosion, spalling.  
+- **Multimodal SHM:** inspections + vision + vibration + environment.  
+- **Physics-informed modelling:** coupling mechanics with data-driven methods. Live-load estimation from deflection alone is **not** claimed; it would require stiffness models, calibration, and experimental validation.
 
----
-
-## BridgeWise integration sketch
-
-- Field mapping (placeholders for municipal field names): [`docs/field_mapping.md`](docs/field_mapping.md)
-- Score one bridge history JSON:  
-  `python -m src.predict_from_record examples/bridge_history_example.json`
-
----
-
-## Reproduce
+## 13. Reproduction instructions
 
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 python -m pip install -r requirements.txt
-python run_all.py
+python run_all.py                 # download + tests + core + supplementary
+python run_all.py --core-only     # faster core temporal experiments only
 ```
 
-Or: `download_data` → `pytest` → `train_eval` → `predict_from_record`.  
-Pinned deps verified on **Python 3.14 / Win64**. Seeds: project `42`; eval `42, 123, 456`.
+Requires Python with available wheels for the dependency ranges in `requirements.txt` (tested on Python 3.14 / Win64; other 3.10+ platforms should work where wheels exist—**not exhaustively tested**).
 
-```
-src/          download, load, panel, features, targets, splits, baselines, models, eval, predict
-tests/        target + time-split checks
-docs/         field mapping, missing-value policy
-results/      committed metrics + figures from the reported run
-data/raw/     gitignored — download via src/download_data.py
-```
+Seeds: project `42`; evaluation `{42, 123, 456}`.
 
----
+## 14. Data attribution and authorship
 
-## Limitations (please read)
-
-1. **Not Karaj data** — climate, materials, coding practice, and scales differ; retrain before operational use.
-2. **Carry-forward / biennial inspections** dilute true one-year deterioration signal.
-3. **Miscalibrated probabilities** under class weighting; threshold 0.10 is illustrative only.
-4. **Train labels can use year \(T{+}1\) ratings** while the test set uses year \(T{+}1\) as *features* (standard one-step panel; stricter isolation would stop training one year earlier).
-5. **No sensors, video, or rehab modelling** in this repo.
-6. Association ≠ causation; scores are prioritisation signals, not work orders.
-
----
-
-## Planned directions (not implemented here)
-
-- Train/evaluate on BridgeWise panels when municipal research data are available.
-- Vision-based **displacement / vibration** from video and shifts in **natural frequencies** as condition indicators (not “live load from deck bounce” without stiffness/calibration).
-- Low-cost sensing and public SHM benchmarks as a later monitoring layer.
-
----
-
-## Attribution
-
-NBI data published by FHWA. Code: research prototype by Mehdi Gholami, for academic discussion of inspection → predictive maintenance workflows.
+NBI data are published by FHWA. This code is a research prototype by **Mehdi Gholami** for academic discussion of inspection-driven predictive maintenance. No municipal confidential data are included.

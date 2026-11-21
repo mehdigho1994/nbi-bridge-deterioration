@@ -1,0 +1,45 @@
+{
+  "split": "standard_train_to_2023_val_2023_test_2024",
+  "groups": {
+    "current_ratings": {
+      "n_features_numeric": 4,
+      "n_features_categorical": 0,
+      "selected_max_iter": 50,
+      "test_roc_auc": 0.6788617473699918,
+      "test_average_precision": 0.08362261387825437,
+      "mean_predicted_probability": 0.03544775885141299
+    },
+    "current_plus_history": {
+      "n_features_numeric": 14,
+      "n_features_categorical": 0,
+      "selected_max_iter": 150,
+      "test_roc_auc": 0.6989293441766768,
+      "test_average_precision": 0.10508296929942107,
+      "mean_predicted_probability": 0.030964341870829276
+    },
+    "structure_ops": {
+      "n_features_numeric": 2,
+      "n_features_categorical": 0,
+      "selected_max_iter": 200,
+      "test_roc_auc": 0.5577967619189734,
+      "test_average_precision": 0.08389590370217434,
+      "mean_predicted_probability": 0.03445471419565023
+    },
+    "structure_ops_with_cats": {
+      "n_features_numeric": 2,
+      "n_features_categorical": 2,
+      "selected_max_iter": 200,
+      "test_roc_auc": 0.573836752965754,
+      "test_average_precision": 0.08650489352783833,
+      "mean_predicted_probability": 0.033999627010416644
+    },
+    "all_features": {
+      "n_features_numeric": 16,
+      "n_features_categorical": 2,
+      "selected_max_iter": 100,
+      "test_roc_auc": 0.7401711557114079,
+      "test_average_precision": 0.14000464354636422,
+      "mean_predicted_probability": 0.0323435620832637
+    }
+  }
+}
