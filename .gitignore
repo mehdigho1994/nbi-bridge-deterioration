@@ -1,0 +1,45 @@
+# Large FHWA downloads (re-fetch via src/download_data.py)
+data/raw/*
+!data/raw/.gitkeep
+
+# Processed panel can be large; keep only small meta if present
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/panel_meta.json
+!data/processed/verified_columns.json
+
+# Results: keep summary + figures for reviewers; ignore bulky dumps
+results/*
+!results/.gitkeep
+!results/figures/
+!results/figures/**
+!results/metrics_summary.csv
+!results/metrics_full.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Model dumps / large prediction CSVs
+*.joblib
+*.pkl
+results/predictions_*.csv

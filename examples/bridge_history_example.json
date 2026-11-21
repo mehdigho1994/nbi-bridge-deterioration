@@ -1,0 +1,42 @@
+{
+  "bridge_id": "51|EXAMPLE0001",
+  "state_code": "51",
+  "structure_number": "EXAMPLE0001",
+  "year_built": 1988,
+  "structure_kind": "3",
+  "structure_type": "02",
+  "inspections": [
+    {
+      "inventory_year": 2020,
+      "deck_condition": "7",
+      "superstructure_condition": "7",
+      "substructure_condition": "6",
+      "adt": 4200,
+      "inspection_date": "0820"
+    },
+    {
+      "inventory_year": 2021,
+      "deck_condition": "7",
+      "superstructure_condition": "6",
+      "substructure_condition": "6",
+      "adt": 4300,
+      "inspection_date": "0921"
+    },
+    {
+      "inventory_year": 2022,
+      "deck_condition": "6",
+      "superstructure_condition": "6",
+      "substructure_condition": "6",
+      "adt": 4400,
+      "inspection_date": "0822"
+    },
+    {
+      "inventory_year": 2023,
+      "deck_condition": "6",
+      "superstructure_condition": "6",
+      "substructure_condition": "5",
+      "adt": 4500,
+      "inspection_date": "0723"
+    }
+  ]
+}

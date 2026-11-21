@@ -1,0 +1,39 @@
+{
+  "condition_value_counts": {
+    "DECK_COND_058_N": 33084,
+    "DECK_COND_058_blank": 0,
+    "DECK_COND_058_numeric": 106928,
+    "DECK_COND_058_other": 0,
+    "SUPERSTRUCTURE_COND_059_N": 31970,
+    "SUPERSTRUCTURE_COND_059_blank": 0,
+    "SUPERSTRUCTURE_COND_059_numeric": 108042,
+    "SUPERSTRUCTURE_COND_059_other": 0,
+    "SUBSTRUCTURE_COND_060_N": 31893,
+    "SUBSTRUCTURE_COND_060_blank": 0,
+    "SUBSTRUCTURE_COND_060_numeric": 108119,
+    "SUBSTRUCTURE_COND_060_other": 0
+  },
+  "target_report": {
+    "n_bridge_years": 140012,
+    "n_with_next_year": 125142,
+    "n_excluded_current_N_or_missing": 29530,
+    "n_excluded_next_N_or_missing": 29597,
+    "n_primary_defined": 95474,
+    "n_primary_positive": 3240,
+    "n_primary_negative": 92234
+  },
+  "n_rows": 140012,
+  "n_bridges": 14841,
+  "years": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ]
+}

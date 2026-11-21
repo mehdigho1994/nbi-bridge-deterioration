@@ -1,0 +1,11 @@
+# Pinned to versions with wheels on Python 3.14 (Win64) as of 2026-11.
+# Prefer: python -m venv .venv && pip install -r requirements.txt
+numpy==2.5.5
+pandas==3.1.1
+scikit-learn==1.9.1
+matplotlib==3.11.2
+scipy==1.18.1
+requests==2.34.2
+pytest==9.2.0
+joblib==1.6.0
+pyarrow==26.0.1
